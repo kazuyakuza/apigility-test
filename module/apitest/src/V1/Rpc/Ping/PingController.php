@@ -7,5 +7,8 @@ class PingController extends AbstractActionController
 {
     public function pingAction()
     {
+    	return [
+    		'ack' => time()	
+    	];
     }
 }
