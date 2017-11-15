@@ -21,12 +21,22 @@ return [
                     ],
                 ],
             ],
+            'apitest.rest.example2' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/example_2[/:example_2_id]',
+                    'defaults' => [
+                        'controller' => 'apitest\\V1\\Rest\\Example2\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
         'uri' => [
             0 => 'apitest.rest.example',
             1 => 'apitest.rpc.ping',
+            2 => 'apitest.rest.example2',
         ],
     ],
     'zf-rest' => [
@@ -49,14 +59,37 @@ return [
             'page_size' => 25,
             'page_size_param' => null,
             'entity_class' => \apitest\V1\Rest\Example\ExampleEntity::class,
-            'collection_class' => \apitest\V1\Rest\Example\ExampleCollection::class,
+            'collection_class' => 'apitest\\V1\\Rest\\E',
             'service_name' => 'example',
+        ],
+        'apitest\\V1\\Rest\\Example2\\Controller' => [
+            'listener' => 'apitest\\V1\\Rest\\Example2\\Example2Resource',
+            'route_name' => 'apitest.rest.example2',
+            'route_identifier_name' => 'example_2_id',
+            'collection_name' => 'example_2',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \apitest\V1\Rest\Example2\Example2Entity::class,
+            'collection_class' => \apitest\V1\Rest\Example2\Example2Collection::class,
+            'service_name' => 'example_2',
         ],
     ],
     'zf-content-negotiation' => [
         'controllers' => [
             'apitest\\V1\\Rest\\Example\\Controller' => 'HalJson',
             'apitest\\V1\\Rpc\\Ping\\Controller' => 'Json',
+            'apitest\\V1\\Rest\\Example2\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'apitest\\V1\\Rest\\Example\\Controller' => [
@@ -69,6 +102,11 @@ return [
                 1 => 'application/json',
                 2 => 'application/*+json',
             ],
+            'apitest\\V1\\Rest\\Example2\\Controller' => [
+                0 => 'application/vnd.apitest.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'apitest\\V1\\Rest\\Example\\Controller' => [
@@ -76,6 +114,10 @@ return [
                 1 => 'application/json',
             ],
             'apitest\\V1\\Rpc\\Ping\\Controller' => [
+                0 => 'application/vnd.apitest.v1+json',
+                1 => 'application/json',
+            ],
+            'apitest\\V1\\Rest\\Example2\\Controller' => [
                 0 => 'application/vnd.apitest.v1+json',
                 1 => 'application/json',
             ],
@@ -87,12 +129,30 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'apitest.rest.example',
                 'route_identifier_name' => 'example_id',
-                'hydrator' => \Zend\Hydrator\ArraySerializable::class,
+                'hydrator' => \Zend\Hydrator\ObjectProperty::class,
             ],
             \apitest\V1\Rest\Example\ExampleCollection::class => [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'apitest.rest.example',
                 'route_identifier_name' => 'example_id',
+                'is_collection' => true,
+            ],
+            'apitest\\V1\\Rest\\E' => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apitest.rest.example',
+                'route_identifier_name' => 'example_id',
+                'is_collection' => true,
+            ],
+            \apitest\V1\Rest\Example2\Example2Entity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apitest.rest.example2',
+                'route_identifier_name' => 'example_2_id',
+                'hydrator' => \Zend\Hydrator\ArraySerializable::class,
+            ],
+            \apitest\V1\Rest\Example2\Example2Collection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apitest.rest.example2',
+                'route_identifier_name' => 'example_2_id',
                 'is_collection' => true,
             ],
         ],
@@ -102,10 +162,17 @@ return [
             'apitest\\V1\\Rest\\Example\\ExampleResource' => [
                 'adapter_name' => 'local-db-test',
                 'table_name' => 'example',
-                'hydrator_name' => \Zend\Hydrator\ArraySerializable::class,
+                'hydrator_name' => \Zend\Hydrator\ObjectProperty::class,
                 'controller_service_name' => 'apitest\\V1\\Rest\\Example\\Controller',
                 'entity_identifier_name' => 'id',
                 'table_service' => 'apitest\\V1\\Rest\\Example\\ExampleResource\\Table',
+            ],
+            'apitest\\V1\\Rest\\Example2\\Example2Resource' => [
+                'adapter_name' => 'local-db-test',
+                'table_name' => 'example_2',
+                'hydrator_name' => \Zend\Hydrator\ArraySerializable::class,
+                'controller_service_name' => 'apitest\\V1\\Rest\\Example2\\Controller',
+                'entity_identifier_name' => 'id',
             ],
         ],
     ],
@@ -115,6 +182,9 @@ return [
         ],
         'apitest\\V1\\Rpc\\Ping\\Controller' => [
             'input_filter' => 'apitest\\V1\\Rpc\\Ping\\Validator',
+        ],
+        'apitest\\V1\\Rest\\Example2\\Controller' => [
+            'input_filter' => 'apitest\\V1\\Rest\\Example2\\Validator',
         ],
     ],
     'input_filter_specs' => [
@@ -140,6 +210,76 @@ return [
                 'filters' => [],
                 'name' => 'ack',
                 'description' => 'Acknowledge the request with a timestamp',
+            ],
+        ],
+        'apitest\\V1\\Rest\\Example2\\Validator' => [
+            0 => [
+                'name' => 'id',
+                'required' => true,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\Digits::class,
+                    ],
+                ],
+                'validators' => [],
+            ],
+            1 => [
+                'name' => 'field1',
+                'required' => true,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                ],
+                'validators' => [
+                    0 => [
+                        'name' => \Zend\Validator\StringLength::class,
+                        'options' => [
+                            'min' => 1,
+                            'max' => '65535',
+                        ],
+                    ],
+                ],
+            ],
+            2 => [
+                'name' => 'field2',
+                'required' => true,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\Digits::class,
+                    ],
+                ],
+                'validators' => [],
+            ],
+            3 => [
+                'name' => 'field3',
+                'required' => true,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                ],
+                'validators' => [
+                    0 => [
+                        'name' => \Zend\Validator\StringLength::class,
+                        'options' => [
+                            'min' => 1,
+                            'max' => '255',
+                        ],
+                    ],
+                ],
             ],
         ],
     ],
