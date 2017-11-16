@@ -30,6 +30,15 @@ return [
                     ],
                 ],
             ],
+            'apitest.rest.example_1' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/example_1[/:example_1_id]',
+                    'defaults' => [
+                        'controller' => 'apitest\\V1\\Rest\\Example_1\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
@@ -37,6 +46,7 @@ return [
             0 => 'apitest.rest.example',
             1 => 'apitest.rpc.ping',
             2 => 'apitest.rest.example2',
+            3 => 'apitest.rest.example_1',
         ],
     ],
     'zf-rest' => [
@@ -84,12 +94,35 @@ return [
             'collection_class' => \apitest\V1\Rest\Example2\Example2Collection::class,
             'service_name' => 'example_2',
         ],
+        'apitest\\V1\\Rest\\Example_1\\Controller' => [
+            'listener' => \apitest\V1\Rest\Example_1\Example_1Resource::class,
+            'route_name' => 'apitest.rest.example_1',
+            'route_identifier_name' => 'example_1_id',
+            'collection_name' => 'example_1',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \apitest\V1\Rest\Example_1\Example_1Entity::class,
+            'collection_class' => \apitest\V1\Rest\Example_1\Example_1Collection::class,
+            'service_name' => 'example_1',
+        ],
     ],
     'zf-content-negotiation' => [
         'controllers' => [
             'apitest\\V1\\Rest\\Example\\Controller' => 'HalJson',
             'apitest\\V1\\Rpc\\Ping\\Controller' => 'Json',
             'apitest\\V1\\Rest\\Example2\\Controller' => 'HalJson',
+            'apitest\\V1\\Rest\\Example_1\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'apitest\\V1\\Rest\\Example\\Controller' => [
@@ -107,6 +140,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'apitest\\V1\\Rest\\Example_1\\Controller' => [
+                0 => 'application/vnd.apitest.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'apitest\\V1\\Rest\\Example\\Controller' => [
@@ -118,6 +156,10 @@ return [
                 1 => 'application/json',
             ],
             'apitest\\V1\\Rest\\Example2\\Controller' => [
+                0 => 'application/vnd.apitest.v1+json',
+                1 => 'application/json',
+            ],
+            'apitest\\V1\\Rest\\Example_1\\Controller' => [
                 0 => 'application/vnd.apitest.v1+json',
                 1 => 'application/json',
             ],
@@ -153,6 +195,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'apitest.rest.example2',
                 'route_identifier_name' => 'example_2_id',
+                'is_collection' => true,
+            ],
+            \apitest\V1\Rest\Example_1\Example_1Entity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apitest.rest.example_1',
+                'route_identifier_name' => 'example_1_id',
+                'hydrator' => \Zend\Hydrator\ObjectProperty::class,
+            ],
+            \apitest\V1\Rest\Example_1\Example_1Collection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'apitest.rest.example_1',
+                'route_identifier_name' => 'example_1_id',
                 'is_collection' => true,
             ],
         ],
@@ -295,6 +349,11 @@ return [
                 0 => 'GET',
             ],
             'route_name' => 'apitest.rpc.ping',
+        ],
+    ],
+    'service_manager' => [
+        'factories' => [
+            \apitest\V1\Rest\Example_1\Example_1Resource::class => \apitest\V1\Rest\Example_1\Example_1ResourceFactory::class,
         ],
     ],
 ];
